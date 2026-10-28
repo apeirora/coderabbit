@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://www.coderabbit.ai/integrations/schema.v2.json
+# Preserve inherited review settings; this baseline changes summaries only.
+# https://docs.coderabbit.ai/configuration/configuration-inheritance
+inheritance: true
+reviews:
+  high_level_summary: true
+  high_level_summary_instructions: |
+    Write for the whole team, including people who do not read this code.
+    Use plain English and keep the complete summary within 150 words.
+    Use these four short sections:
+    - What changes: Explain the practical impact on users, operators, or
+      contributors. For internal-only work, say so and explain its purpose.
+    - Why it matters: Explain the problem addressed or benefit. If the
+      motivation is not evidenced by the changes or PR context, say it is unclear.
+    - Compatibility: State any breaking API, configuration, or behavior changes.
+      If none are identified, say so without claiming compatibility is guaranteed.
+    - Action needed: State required upgrade, migration, deployment, or
+      configuration steps. If none are identified, say so.
+    Describe outcomes, not a file-by-file inventory or implementation walkthrough.
+    Avoid class names, code symbols, and unexplained acronyms unless essential.
+    Use the repository's actual context. Do not assume a particular product,
+    team, foundation, or organization, and do not add a fixed branding prefix.
+    Do not invent benefits, requirements, or validation results.
