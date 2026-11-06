@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://www.coderabbit.ai/integrations/schema.v2.json
-# Preserve inherited review settings; this baseline changes summaries only.
+# Preserve inherited review settings; this baseline adds summaries and
+# personal-data review guidance.
 # https://docs.coderabbit.ai/configuration/configuration-inheritance
 inheritance: true
 reviews:
@@ -21,3 +22,52 @@ reviews:
     Use the repository's actual context. Do not assume a particular product,
     team, foundation, or organization, and do not add a fixed branding prefix.
     Do not invent benefits, requirements, or validation results.
+  path_instructions:
+    - path: "docs/**"
+      instructions: |
+        Treat every example as publishable. Flag real personal email addresses,
+        personal names used as owners or authors, home-directory paths
+        (/Users/<name>, /home/<name>, C:\Users\<name>), kubeconfig paths,
+        tokens, private keys, and internal hostnames. Require placeholders such
+        as <operator>@sap.com, /absolute/path/..., and example.com. Do not
+        repeat a flagged personal value in the review comment; identify the
+        file and the category instead.
+    - path: "**/README.md"
+      instructions: |
+        Treat every example as publishable. Flag real personal email addresses,
+        personal names used as owners or authors, home-directory paths,
+        kubeconfig paths, tokens, private keys, and internal hostnames. Require
+        placeholders such as <operator>@sap.com and /absolute/path/....
+        Do not repeat a flagged personal value in the review comment.
+    - path: "clusters/**"
+      instructions: |
+        Owner email addresses in clusters/*/cluster-vars.yaml are configuration,
+        not documentation. Do not flag them there. Flag new absolute
+        home-directory paths, kubeconfig paths, tokens, private keys, and real
+        personal addresses added anywhere else under clusters/.
+    - path: "scripts/**"
+      instructions: |
+        Flag new absolute home-directory paths, kubeconfig paths, tokens,
+        private keys, and real personal email addresses. Test fixtures must use
+        example.com, example.test, or example.invalid addresses and placeholder
+        paths such as /absolute/path/....
+  pre_merge_checks:
+    override_requested_reviewers_only: true
+    custom_checks:
+      - name: "No personal data in examples"
+        mode: "warning"
+        instructions: |
+          Fail when an added line in docs/**, **/*.md, **/*.json, **/*.yaml,
+          **/*.yml, or **/*.sh contains any of:
+          - an email address that is not an allowed placeholder. Allowed forms:
+            addresses ending in @example.com, @example.test, @example.invalid,
+            or @users.noreply.github.com; demo@demo.com; and angle-bracket
+            placeholders such as <operator>@sap.com.
+          - a home-directory path matching /Users/<name>, /home/<name>, or
+            C:\Users\<name>.
+          - a private key block, kubeconfig content, or access token.
+          Exception: clusters/*/cluster-vars.yaml may contain real owner email
+          addresses as configuration.
+          Pass when every match is an allowed placeholder or the exception
+          applies. Report the file and the matched category. Do not print the
+          full personal value.
