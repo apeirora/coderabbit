@@ -1,0 +1,22 @@
+name: Test PII guard
+
+on:
+  pull_request:
+    paths:
+      - "pii-guard/**"
+      - ".github/workflows/test-pii-guard.yml"
+  push:
+    branches: [main]
+    paths:
+      - "pii-guard/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run scanner tests
+        run: bash pii-guard/test.sh

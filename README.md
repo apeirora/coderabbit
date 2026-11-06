@@ -14,9 +14,49 @@ sections, with a total limit of 150 words:
 3. **Compatibility:** breaking API, configuration, or behavior changes.
 4. **Action needed:** upgrade, migration, deployment, or configuration steps.
 
-It does not configure PII detection, security tools, review profiles, notification
-verbosity, automatic review scheduling, approval policies, or merge gates.
-Summary placement is left to the existing settings.
+It does not configure PII detection tools, security scanners, review profiles,
+notification verbosity, automatic review scheduling, approval policies, or
+merge gates. Summary placement is left to the existing settings.
+
+## PII guard
+
+This public repository also hosts the reusable `pii-guard` action and workflow.
+It is the deterministic merge gate for personal data in Showroom repositories.
+It scans lines added by a pull request and fails on real email addresses,
+home-directory paths, and private key material.
+
+Add this caller workflow to a repository:
+
+```yaml
+name: PII guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  pii-guard:
+    uses: apeirora/coderabbit/.github/workflows/pii-guard.yml@main
+```
+
+Require the `pii-guard` status check in the repository ruleset to block merging.
+Local tests: `bash pii-guard/test.sh`.
+
+## Review guidance
+
+The same `.coderabbit.yaml` adds path instructions for `docs/**`,
+`**/README.md`, `clusters/**`, and `scripts/**`. They require placeholders for
+personal data and treat owner emails in `clusters/*/cluster-vars.yaml` as
+configuration.
+
+A custom pre-merge check, `No personal data in examples`, flags real email
+addresses, home-directory paths, private keys, kubeconfig content, and access
+tokens. It starts in `warning` mode. Custom checks require a CodeRabbit Team or
+higher plan. These checks are advisory inside CodeRabbit. The PII guard above is
+the deterministic merge gate.
 
 ## How it applies
 
