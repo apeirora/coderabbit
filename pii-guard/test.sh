@@ -16,7 +16,8 @@ git -C "$tmp" commit -qm base
 base="$(git -C "$tmp" rev-parse HEAD)"
 
 # Failing case: real email, home path, and a private key marker.
-mkdir -p "$tmp/docs" "$tmp/clusters/dev"
+mkdir -p "$tmp/docs" "$tmp/clusters/dev" "$tmp/.github"
+printf '.*\n' > "$tmp/.github/pii-allowlist.txt"
 printf 'Contact marek.gruszecki@sap.com\n' > "$tmp/docs/email.md"
 printf 'export KG=/Users/igor/garden.yaml\n' > "$tmp/docs/path.md"
 printf -- '-----BEGIN PRIVATE KEY-----\n' > "$tmp/docs/key.md"

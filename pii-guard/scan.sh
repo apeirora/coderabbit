@@ -3,10 +3,10 @@
 #
 # Inputs:
 #   BASE_SHA, HEAD_SHA  Required git revisions. The diff is BASE...HEAD.
-#   PII_ALLOWLIST_FILE  Optional path to newline-delimited path regexes.
 #
 # Output: GitHub Actions error annotations with masked values. Exit 1 on a
 # finding, 0 when clean, 2 for invalid input. No network or write access.
+# Exceptions are hardcoded here and cannot be supplied by the pull request.
 set -euo pipefail
 
 base="${BASE_SHA:-${1:-}}"
@@ -20,15 +20,6 @@ email_re='[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}'
 home_re='(/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|[A-Za-z]:\\{1,2}Users\\{1,2}[A-Za-z0-9._-]+)'
 key_re='BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
 
-allow_file="${PII_ALLOWLIST_FILE:-.github/pii-allowlist.txt}"
-allow_patterns=()
-if [[ -f "$allow_file" ]]; then
-  while IFS= read -r pattern; do
-    [[ -z "$pattern" || "$pattern" == \#* ]] && continue
-    allow_patterns+=("$pattern")
-  done < "$allow_file"
-fi
-
 # Return 0 when an address is a documented placeholder or service address.
 allowed_email() {
   case "$1" in
@@ -40,18 +31,12 @@ allowed_email() {
   return 1
 }
 
-# Return 0 when the path is configuration or explicitly allowlisted.
+# Return 0 when the path is the one reviewed configuration exception.
 allowed_path() {
   case "$1" in
     clusters/*/cluster-vars.yaml|clusters/*/cluster-vars.yml)
       return 0 ;;
   esac
-  local pattern
-  for pattern in "${allow_patterns[@]}"; do
-    if grep -Eq -- "$pattern" <<< "$1"; then
-      return 0
-    fi
-  done
   return 1
 }
 
