@@ -42,8 +42,9 @@ jobs:
     uses: apeirora/coderabbit/.github/workflows/pii-guard.yml@main
 ```
 
-Require the `pii-guard` status check in the repository ruleset to block merging.
-Local tests: `bash pii-guard/test.sh`.
+The caller workflow alone does not block merges. Add the `pii-guard / pii-guard`
+status check to the repository ruleset or branch protection rule and mark it
+required. Local tests: `bash pii-guard/test.sh`.
 
 ## Review guidance
 
@@ -55,8 +56,12 @@ configuration.
 A custom pre-merge check, `No personal data in examples`, flags real email
 addresses, home-directory paths, private keys, kubeconfig content, and access
 tokens. It starts in `warning` mode. Custom checks require a CodeRabbit Team or
-higher plan. These checks are advisory inside CodeRabbit. The PII guard above is
-the deterministic merge gate.
+higher plan.
+
+The check covers added lines in `docs/**`, `**/*.md`, `**/*.json`, `**/*.yaml`,
+`**/*.yml`, and `**/*.sh`. It does not cover every configuration format, for
+example `config.toml` outside those paths. These checks are advisory inside
+CodeRabbit. The PII guard above is the deterministic merge gate.
 
 ## How it applies
 

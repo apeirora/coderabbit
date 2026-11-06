@@ -60,9 +60,10 @@ reviews:
           Fail when an added line in docs/**, **/*.md, **/*.json, **/*.yaml,
           **/*.yml, or **/*.sh contains any of:
           - an email address that is not an allowed placeholder. Allowed forms:
-            addresses ending in @example.com, @example.test, @example.invalid,
-            or @users.noreply.github.com; demo@demo.com; and angle-bracket
-            placeholders such as <operator>@sap.com.
+            addresses ending in @example.com, @example.test, or @example.invalid;
+            demo@demo.com; service addresses noreply@github.com and
+            git@github.com; and angle-bracket placeholders such as
+            <operator>@sap.com.
           - a home-directory path matching /Users/<name>, /home/<name>, or
             C:\Users\<name>.
           - a private key block, kubeconfig content, or access token.
