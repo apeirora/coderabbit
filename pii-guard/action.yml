@@ -1,0 +1,21 @@
+name: PII guard
+description: Fail when a pull request adds personal data, home paths, or private keys.
+author: ApeiroRA Showroom
+
+inputs:
+  base-sha:
+    description: Pull request base commit SHA.
+    required: true
+  head-sha:
+    description: Pull request head commit SHA.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Scan added lines
+      shell: bash
+      env:
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+      run: bash "$GITHUB_ACTION_PATH/scan.sh"
