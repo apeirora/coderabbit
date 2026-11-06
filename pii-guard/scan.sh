@@ -32,7 +32,7 @@ fi
 # Return 0 when an address is a documented placeholder or service address.
 allowed_email() {
   case "$1" in
-    *@example.com|*@example.test|*@example.invalid|*@users.noreply.github.com)
+    *@example.com|*@example.test|*@example.invalid)
       return 0 ;;
     demo@demo.com|noreply@github.com|git@github.com)
       return 0 ;;
