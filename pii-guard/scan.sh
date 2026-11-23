@@ -31,10 +31,15 @@ allowed_email() {
   return 1
 }
 
-# Return 0 when the path is the one reviewed configuration exception.
+# Return 0 when real email addresses in the path are reviewed configuration:
+# organization owners in cluster-vars, and team members with their generated
+# access under platform/access/ (apeirora/showroom#1231). Home paths and private
+# keys are still rejected there.
 allowed_path() {
   case "$1" in
     clusters/*/cluster-vars.yaml|clusters/*/cluster-vars.yml)
+      return 0 ;;
+    platform/access/*)
       return 0 ;;
   esac
   return 1
@@ -61,15 +66,16 @@ fi
 
 while IFS=$'\t' read -r path line text; do
   [[ -z "$path" ]] && continue
-  allowed_path "$path" && continue
 
-  while IFS= read -r email; do
-    [[ -z "$email" ]] && continue
-    allowed_email "$email" && continue
-    printf '::error file=%s,line=%s::Personal email address %s\n' \
-      "$path" "$line" "$(mask_email "$email")"
-    fail=1
-  done < <(grep -Eo "$email_re" <<< "$text" || true)
+  if ! allowed_path "$path"; then
+    while IFS= read -r email; do
+      [[ -z "$email" ]] && continue
+      allowed_email "$email" && continue
+      printf '::error file=%s,line=%s::Personal email address %s\n' \
+        "$path" "$line" "$(mask_email "$email")"
+      fail=1
+    done < <(grep -Eo "$email_re" <<< "$text" || true)
+  fi
 
   while IFS= read -r home; do
     [[ -z "$home" ]] && continue
