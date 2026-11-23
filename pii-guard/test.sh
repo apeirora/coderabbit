@@ -60,4 +60,17 @@ if (cd "$tmp" && BASE_SHA="$base" HEAD_SHA="$head" bash "$here/scan.sh" >/dev/nu
   exit 1
 fi
 
+# Failing case: the path exception covers email addresses only.
+git -C "$tmp" reset -q --hard "$base"
+mkdir -p "$tmp/platform/access/teams"
+printf 'members:\n  - email: person@sap.com\n# -----BEGIN PRIVATE KEY-----\n' > "$tmp/platform/access/teams/showroom.yaml"
+git -C "$tmp" add .
+git -C "$tmp" commit -qm key
+head="$(git -C "$tmp" rev-parse HEAD)"
+
+if (cd "$tmp" && BASE_SHA="$base" HEAD_SHA="$head" bash "$here/scan.sh" >/dev/null 2>&1); then
+  echo "FAIL: expected private key material under platform/access/ to fail" >&2
+  exit 1
+fi
+
 echo "PII guard tests passed."
