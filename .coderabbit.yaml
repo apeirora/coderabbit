@@ -45,6 +45,11 @@ reviews:
         not documentation. Do not flag them there. Flag new absolute
         home-directory paths, kubeconfig paths, tokens, private keys, and real
         personal addresses added anywhere else under clusters/.
+    - path: "platform/access/**"
+      instructions: |
+        Member email addresses in team files and in the files generated from
+        them are configuration, not documentation. Do not flag them there.
+        Flag home-directory paths, kubeconfig paths, tokens, and private keys.
     - path: "scripts/**"
       instructions: |
         Flag new absolute home-directory paths, kubeconfig paths, tokens,
@@ -67,8 +72,9 @@ reviews:
           - a home-directory path matching /Users/<name>, /home/<name>, or
             C:\Users\<name>.
           - a private key block, kubeconfig content, or access token.
-          Exception: clusters/*/cluster-vars.yaml may contain real owner email
-          addresses as configuration.
+          Exceptions: clusters/*/cluster-vars.yaml may contain real owner email
+          addresses, and files under platform/access/ may contain real member
+          email addresses, as configuration.
           Pass when every match is an allowed placeholder or the exception
           applies. Report the file and the matched category. Do not print the
           full personal value.

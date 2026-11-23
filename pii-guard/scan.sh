@@ -31,10 +31,14 @@ allowed_email() {
   return 1
 }
 
-# Return 0 when the path is the one reviewed configuration exception.
+# Return 0 when the path is a reviewed configuration exception: organization
+# owners in cluster-vars, and team members with their generated access under
+# platform/access/ (apeirora/showroom#1231).
 allowed_path() {
   case "$1" in
     clusters/*/cluster-vars.yaml|clusters/*/cluster-vars.yml)
+      return 0 ;;
+    platform/access/*)
       return 0 ;;
   esac
   return 1

@@ -23,7 +23,10 @@ merge gates. Summary placement is left to the existing settings.
 This public repository also hosts the reusable `pii-guard` action and workflow.
 It is the deterministic merge gate for personal data in Showroom repositories.
 It scans lines added by a pull request and fails on real email addresses,
-home-directory paths, and private key material.
+home-directory paths, and private key material. Real SAP addresses are
+allowed only as configuration in `clusters/*/cluster-vars.yaml` (organization
+owners) and under `platform/access/` (team members and the access generated
+from them, apeirora/showroom#1231).
 
 Add this caller workflow to a repository:
 
@@ -49,8 +52,9 @@ required. Local tests: `bash pii-guard/test.sh`.
 ## Review guidance
 
 The same `.coderabbit.yaml` adds path instructions for `docs/**`,
-`**/README.md`, `clusters/**`, and `scripts/**`. They require placeholders for
-personal data and treat owner emails in `clusters/*/cluster-vars.yaml` as
+`**/README.md`, `clusters/**`, `platform/access/**`, and `scripts/**`. They
+require placeholders for personal data and treat owner emails in
+`clusters/*/cluster-vars.yaml` and member emails under `platform/access/` as
 configuration.
 
 A custom pre-merge check, `No personal data in examples`, flags real email

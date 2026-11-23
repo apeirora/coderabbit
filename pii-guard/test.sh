@@ -31,18 +31,32 @@ if (cd "$tmp" && BASE_SHA="$base" HEAD_SHA="$head" bash "$here/scan.sh" >/dev/nu
   exit 1
 fi
 
-# Passing case: placeholders, demo address, and the config exception.
+# Passing case: placeholders, demo address, and the config exceptions.
 git -C "$tmp" reset -q --hard "$base"
-mkdir -p "$tmp/docs" "$tmp/clusters/dev"
+mkdir -p "$tmp/docs" "$tmp/clusters/dev" "$tmp/platform/access/teams"
 printf 'Contact <operator>@sap.com and demo@demo.com\n' > "$tmp/docs/email.md"
 printf 'export KG=/absolute/path/garden.yaml\n' > "$tmp/docs/path.md"
 printf 'SHOWROOM_ORG_OWNER_EMAIL: marek.gruszecki@sap.com\n' > "$tmp/clusters/dev/cluster-vars.yaml"
+printf 'members:\n  - email: person@sap.com\n' > "$tmp/platform/access/teams/showroom.yaml"
 git -C "$tmp" add .
 git -C "$tmp" commit -qm passing
 head="$(git -C "$tmp" rev-parse HEAD)"
 
 if ! (cd "$tmp" && BASE_SHA="$base" HEAD_SHA="$head" bash "$here/scan.sh" >/dev/null 2>&1); then
   echo "FAIL: expected a pass" >&2
+  exit 1
+fi
+
+# Failing case: the exception is anchored at the repository root.
+git -C "$tmp" reset -q --hard "$base"
+mkdir -p "$tmp/docs/platform/access"
+printf 'members:\n  - email: person@sap.com\n' > "$tmp/docs/platform/access/team.yaml"
+git -C "$tmp" add .
+git -C "$tmp" commit -qm nested
+head="$(git -C "$tmp" rev-parse HEAD)"
+
+if (cd "$tmp" && BASE_SHA="$base" HEAD_SHA="$head" bash "$here/scan.sh" >/dev/null 2>&1); then
+  echo "FAIL: expected a finding outside platform/access/" >&2
   exit 1
 fi
 
